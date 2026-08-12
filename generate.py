@@ -79,7 +79,7 @@ def build_page(data: dict) -> str:
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Turun lounaat</title>
+  <title></title>
   <style>
 {css}
   </style>
@@ -88,7 +88,7 @@ def build_page(data: dict) -> str:
   <main class="shell">
     <header>
       <div>
-        <h1>Turun lounaat</h1>
+        <h1>Kuppis lunch</h1>
         <p class="meta">{esc(date_label)} · {good}/{count} ravintolaa · päivitetty {esc(generated_label)}</p>
       </div>
     </header>
