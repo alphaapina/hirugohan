@@ -7,10 +7,8 @@ on:
   workflow_dispatch:
 
   schedule:
-    # GitHub cron uses UTC.
-    # Finland is UTC+3 in summer, UTC+2 in winter.
-    - cron: "0 5 * * 1-5"
-    - cron: "0 6 * * 1-5"
+    - cron: "0 9 * * 1-5"
+      timezone: "Europe/Helsinki"
 
 permissions:
   contents: read
@@ -25,49 +23,28 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    outputs:
-      should_deploy: ${{ steps.timeguard.outputs.should_deploy }}
-
     steps:
-      - name: Check Helsinki time
-        id: timeguard
-        shell: bash
-        run: |
-          if [[ "${{ github.event_name }}" != "schedule" ]]; then
-            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
-          elif [[ "$(TZ=Europe/Helsinki date +%H)" == "10" ]]; then
-            echo "should_deploy=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Checkout
-        if: steps.timeguard.outputs.should_deploy == 'true'
         uses: actions/checkout@v4
 
       - name: Set up Python
-        if: steps.timeguard.outputs.should_deploy == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
           cache: pip
 
       - name: Install dependencies
-        if: steps.timeguard.outputs.should_deploy == 'true'
         run: pip install -r requirements.txt
 
       - name: Build site
-        if: steps.timeguard.outputs.should_deploy == 'true'
         run: python generate.py
 
       - name: Upload Pages artifact
-        if: steps.timeguard.outputs.should_deploy == 'true'
         uses: actions/upload-pages-artifact@v4
         with:
           path: public
 
   deploy:
-    if: needs.build.outputs.should_deploy == 'true'
     needs: build
     runs-on: ubuntu-latest
 
